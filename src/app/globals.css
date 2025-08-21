@@ -1,26 +1,299 @@
-@import "tailwindcss";
-
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;               /* quita espacio arriba y a los lados */
+  padding: 0;              /* quita espacio interno */
+  height: 100vh; 
+  overflow: hidden; 
+  background-color: #80a8ff;
+  color: white;
+  font-family: Arial, sans-serif;
+}
+
+.login-page, .register-page {
+  display: flex;
+  flex-direction: column; 
+  justify-content: flex-start;
+  align-items: center;
+  min-height: 100vh;
+}
+.container-register {
+  margin: 0 auto; 
+  margin-top: 150px;
+  max-width: 400px;
+  width: 90vw;
+  background-color: #fff;
+  color: #111827;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.6);
+  height: auto; 
+}
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+.container {
+  margin: 0 auto; 
+  max-width: 400px;
+  width: 90vw;
+  background-color: #fff;
+  color: #111827;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.6);
+  height: auto; 
+}
+
+
+.switch-link {
+  color: #60a5fa;
+  cursor: pointer;
+}
+
+.switch-link:hover {
+  text-decoration: underline;
+}
+
+input {
+  padding: 10px;
+  margin-bottom: 3px;
+  border: none;
+  border-radius: 6px;
+  background-color: #f3f4f6;
+  color: #111827;
+}
+
+input::placeholder {
+  color: #6b7280;
+}
+
+button {
+  padding: 12px;
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #1d4ed8;
+}
+
+
+.logo-login {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  padding-top: 60px; /* espacio desde la barra del navegador */
+  margin-bottom: 15px;
+}
+
+.logo-login img {
+  width: 280px;
+  height: auto;
+  object-fit: contain;
+}
+
+/* --- CALENDARIO  --- */
+.react-calendar__navigation button {
+  color: black !important;
+}
+.react-calendar__navigation__label {
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+.react-calendar__tile.weekend {
+  background-color: #001d7d !important; 
+  color: white !important;
+  cursor: not-allowed;
+  border-radius: 6px !important;
+  pointer-events: none; 
+  opacity: 0.7;
+}
+
+.react-calendar__tile {
+  color: black !important;
+  border-radius: 0 !important;
+}
+
+.react-calendar__tile--active {
+  background: #2563eb !important;
+  color: white !important;
+}
+
+.react-calendar__tile:hover {
+  background-color: #60a5fa !important;
+  color: white !important;
+}
+
+.react-calendar__tile--now {
+  background: transparent !important;
+  color: inherit !important;
+}
+
+.react-calendar {
+  border-radius: 12px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box;
+  background-color: white !important;
+  color: black !important;
+  padding: 10px;
+  box-shadow: none !important;
+}
+
+.react-calendar__month-view__weekdays abbr {
+  text-decoration: none !important;
+  border-bottom: none !important;
+  cursor: default;
+}
+
+/* --- DASHBOARD --- */
+.dashboard-container {
+  max-width: 1200px;
+  height: 550px;
+  width: 100%;
+  margin: 60px auto 40px; 
+  padding: 20px;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  user-select: none;
+  font-family: Arial, sans-serif;
+  color: #111827;
+  overflow-x: hidden;   
+  overflow-y: hidden; 
+  box-sizing: border-box;
+}
+
+.botones-arriba {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  align-items: center;
+}
+
+.btn-volver, .btn-marcados {
+  border: none;
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  user-select: none;
+  font-weight: bold;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.btn-volver, .btn-marcados {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 6px;
+  border: none;
+  background-color: #3eb7eb;
+  color: white;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.btn-volver:hover, .btn-marcados:hover {
+  background-color: #90d1ff;
+}
+
+
+.btn-marcados svg, .btn-volver svg {
+  width: 22px;
+  height: 22px;
+}
+
+.titulo-calendario {
+  text-align: left;
+  margin-bottom: 16px;
+}
+
+.leyenda-calendario {
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-start;
+  gap: 24px;
+  font-size: 16px;
+  user-select: none;
+  flex-wrap: nowrap;
+  align-items: center;
+  background-color: white;
+  padding: 10px 15px;
+  border-radius: 8px;
+  color: #111827 !important;
+  overflow-x: auto;
+  box-sizing: border-box;
+  overflow-x: visible;
+}
+
+.leyenda-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #111827 !important;
+}
+
+.cuadro-color {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+}
+
+.texto-leyenda {
+  font-weight: bold;
+  white-space: nowrap;
+  color: #111827 !important; 
+}
+
+.con-borde {
+  border: 1px solid #ccc;
+}
+
+/* --- COLORES DE ESTADO --- */
+.lleno {
+  background-color: #dc2626 !important;
+  color: white !important;
+  border-radius: 8px !important;
+}
+
+.disponible {
+  background-color: #16a34a !important;
+  color: white !important;
+  border-radius: 8px !important;
+}
+
+.vacio {
+  background-color: white !important;
+  color: black !important;
+  border-radius: 8px !important;
+}
+
+.weekend {
+  background-color: #001d7d !important;
+  color: white !important;
+  pointer-events: none;
+  opacity: 0.6;
+  border-radius: 6px !important;
+}
+
+
+.content-container {
+  padding-top: 110px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-left: 20px;
+  padding-right: 20px;
+  box-sizing: border-box;
 }
