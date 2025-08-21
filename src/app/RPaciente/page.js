@@ -2,10 +2,10 @@
 
 import dynamic from "next/dynamic";
 
-const RPacienteComponent = dynamic(() => import("./RPacienteComponent"), {
-  ssr: false, // Desactiva renderizado del lado del servidor
+const RPaciente = dynamic(() => import("./RPaciente"), {
+  ssr: false,
 });
 
 export default function Page() {
-  return <RPacienteComponent />;
+  return <RPaciente />;
 }
