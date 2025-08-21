@@ -105,31 +105,26 @@ export default function AsignarCita() {
     }
 
     try {
-      // Guardar la cita en pacientes
-      await setDoc(doc(db, "pacientes", id), {
-        nombre: paciente.nombre,
-        edad: paciente.edad,
-        sexo: paciente.sexo,
-        telefono: paciente.telefono,
-        patologia: paciente.patologia,
-        domicilio: paciente.domicilio,
+      // Guardar la cita en la colección "citas" para que el dashboard la vea
+      await addDoc(collection(db, "citas"), {
+        pacienteId: paciente.id,
+        nombrePaciente: paciente.nombre,
         fecha,
         horaInicio,
         horaFin,
-        imagenes: paciente.imagenes || [],
+        creadoPor: localStorage.getItem("username") || "Desconocido",
+        timestamp: serverTimestamp(),
       });
 
-      // Obtener usuario actual desde localStorage (puede variar según tu sistema)
+      // Guardar log en la colección "logs"
       const usuarioNombre = localStorage.getItem("username") || "Desconocido";
-
-      // Guardar log en la colección "logs" o "historial"
       await addDoc(collection(db, "logs"), {
-       accion: `Creó cita a: ${paciente.nombre}`,
-  fecha: serverTimestamp(),
-  pacienteId: paciente.id,
-  nombrePaciente: paciente.nombre,
-  usuarioId: usuarioNombre, // si quieres, puedes guardar solo nombre
-  usuarioNombre: usuarioNombre,
+        accion: `Creó cita a: ${paciente.nombre}`,
+        fecha: serverTimestamp(),
+        pacienteId: paciente.id,
+        nombrePaciente: paciente.nombre,
+        usuarioId: usuarioNombre,
+        usuarioNombre: usuarioNombre,
       });
 
       router.push(`/guardado?id=${id}`);
