@@ -1,7 +1,7 @@
 "use client";
 
 import React, { Suspense } from "react";
-import GuardadoComponent from "./guardadocomponentt";
+import GuardadoComponent from "./GuardadoComponent";
 
 export default function Page() {
   return (
