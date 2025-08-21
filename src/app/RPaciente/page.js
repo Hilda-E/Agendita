@@ -1,11 +1,11 @@
 "use client";
-import React, { Suspense } from "react";
-import RPacienteComponent from "./RPacienteComponent";
+
+import dynamic from "next/dynamic";
+
+const RPacienteComponent = dynamic(() => import("./RPaciente"), {
+  ssr: false, // Desactiva renderizado del lado del servidor
+});
 
 export default function Page() {
-  return (
-    <Suspense fallback={<p style={{ textAlign: "center", marginTop: 80 }}>Cargando...</p>}>
-      <RPacienteComponent />
-    </Suspense>
-  );
+  return <RPacienteComponent />;
 }
