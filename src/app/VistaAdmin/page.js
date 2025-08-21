@@ -182,8 +182,8 @@ useEffect(() => {
         fechaMatch = fechaCita.getTime() === f.getTime();
       }
 
-      const buscarMatch = c.nombre.toLowerCase().includes(buscarTexto.toLowerCase()) || 
-                          (c.telefono && c.telefono.toString().includes(buscarTexto));
+      const buscarMatch = (c.nombre?.toLowerCase() || "").includes(buscarTexto.toLowerCase()) || 
+                    (c.telefono && c.telefono.toString().includes(buscarTexto));
 
       return fechaMatch && buscarMatch;
     })
@@ -381,7 +381,8 @@ useEffect(() => {
                 </thead>
                 <tbody>
                   {usuarios
-                    .filter(u => u.username.toLowerCase().includes(buscarTexto.toLowerCase()) || u.email.toLowerCase().includes(buscarTexto.toLowerCase()))
+  .filter(u => (u.username?.toLowerCase() || "").includes(buscarTexto.toLowerCase()) || 
+               (u.email?.toLowerCase() || "").includes(buscarTexto.toLowerCase()))
                     .map(u=>(
                     <tr key={u.id} style={{borderBottom:"1px solid #e5e7eb"}}>
                       <td style={{padding:10}}>{u.username || "(Sin nombre)"}</td>
