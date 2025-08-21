@@ -106,7 +106,7 @@ export default function AsignarCita() {
 
     try {
       // Guardar la cita en la colección "citas" para que el dashboard la vea
-      await addDoc(collection(db, "citas"), {
+      await addDoc(collection(db, "pacientes"), {
         pacienteId: paciente.id,
         nombrePaciente: paciente.nombre,
         fecha,
