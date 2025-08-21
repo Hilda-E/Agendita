@@ -2,10 +2,10 @@
 
 import dynamic from "next/dynamic";
 
-const RPaciente = dynamic(() => import("./RPaciente"), {
+const RPacienteComponent = dynamic(() => import("./RPacienteComponent"), {
   ssr: false,
 });
 
 export default function Page() {
-  return <RPaciente />;
+  return <RPacienteComponent />;
 }
