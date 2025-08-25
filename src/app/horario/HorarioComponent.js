@@ -37,7 +37,7 @@ export default function Horario() {
             const pacienteRef = doc(db, "pacientesMarcados", data.pacienteId);
             const pacienteSnap = await getDoc(pacienteRef);
             if (pacienteSnap.exists()) {
-              pacienteData = pacienteSnap.data();
+                pacienteData = { ...pacienteSnap.data(), ...data }; 
             }
           }
           citasDia.push({
