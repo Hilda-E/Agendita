@@ -29,27 +29,28 @@ export default function Horario() {
         const snapshot = await getDocs(q);
 
         const citasDia = [];
-      snapshot.forEach(async (docu) => {
-  const data = docu.data();
-  let pacienteData = data; // por defecto
-  if (data.pacienteId) {
-    const pacienteRef = doc(db, "pacientesMarcados", data.pacienteId);
-    const pacienteSnap = await getDoc(pacienteRef);
-    if (pacienteSnap.exists()) {
-      pacienteData = pacienteSnap.data();
-    }
-  }
-  citasDia.push({
-    id: docu.id,
-    nombre: pacienteData.nombre || "Paciente",
-    edad: pacienteData.edad || "No especificada",
-    sexo: pacienteData.sexo || "No especificado",
-    patologia: pacienteData.patologia || "No especificada",
-    imagenes: pacienteData.imagenes || [],
-    horaInicio: data.horaInicio || "",
-    horaFin: data.horaFin || "",
-  });
-});
+        // --- CAMBIO NECESARIO: reemplazar forEach async por for...of para esperar getDoc ---
+        for (const docu of snapshot.docs) {
+          const data = docu.data();
+          let pacienteData = data; // por defecto
+          if (data.pacienteId) {
+            const pacienteRef = doc(db, "pacientesMarcados", data.pacienteId);
+            const pacienteSnap = await getDoc(pacienteRef);
+            if (pacienteSnap.exists()) {
+              pacienteData = pacienteSnap.data();
+            }
+          }
+          citasDia.push({
+            id: docu.id,
+            nombre: pacienteData.nombre || "Paciente",
+            edad: pacienteData.edad || "No especificada",
+            sexo: pacienteData.sexo || "No especificado",
+            patologia: pacienteData.patologia || "No especificada",
+            imagenes: pacienteData.imagenes || [],
+            horaInicio: data.horaInicio || "",
+            horaFin: data.horaFin || "",
+          });
+        }
 
         if (citasDia.length === 0) {
           const fallbackSnap = await getDocs(collection(db, "pacientes"));
@@ -163,7 +164,6 @@ export default function Horario() {
     const confirma = confirm("¿Eliminar esta cita? Esta acción no se puede deshacer.");
     if (!confirma) return;
     try {
-      // Obtener datos de la cita antes de eliminar
       const docRef = doc(db, "pacientes", id);
       const docSnap = await getDoc(docRef);
       let nombrePaciente = "Paciente desconocido";
@@ -177,7 +177,6 @@ export default function Horario() {
       if (detallePacienteId === id) setDetallePacienteId(null);
       alert("Cita eliminada.");
 
-      // --- REGISTRAR LOG ---
       const usuarioNombre = localStorage.getItem("username") || "Desconocido";
       await addDoc(collection(db, "logs"), {
         usuarioNombre,
