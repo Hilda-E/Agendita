@@ -105,7 +105,7 @@ export default function Asignar() {
     try {
       // --- CAMBIO IMPORTANTE ---
       // Ahora usamos addDoc para crear una nueva cita sin sobrescribir las anteriores
-      await addDoc(collection(db, "citas"), {
+      await addDoc(collection(db, "pacientes"), {
         pacienteId: paciente.id,
         nombre: paciente.nombre,
         edad: paciente.edad,
