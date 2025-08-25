@@ -1,10 +1,10 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { doc, getDoc, setDoc, collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { doc, getDoc, collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "../firebase";
 
-export default function AsignarCita() {
+export default function Asignar() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
@@ -59,14 +59,12 @@ export default function AsignarCita() {
     const [year, month, day] = e.target.value.split("-");
     const selectedDate = new Date(year, month - 1, day);
 
-    // Bloquear fines de semana
     const dayOfWeek = selectedDate.getDay();
     if (dayOfWeek === 0 || dayOfWeek === 6) {
       alert("No se pueden seleccionar fines de semana (domingo o sábado)");
       return;
     }
 
-    // Bloquear años distintos al actual
     if (+year !== currentYear) {
       alert(`Solo se pueden seleccionar fechas del año ${currentYear}`);
       return;
@@ -105,8 +103,10 @@ export default function AsignarCita() {
     }
 
     try {
-      // Guardar la cita en pacientes
-      await setDoc(doc(db, "pacientes", id), {
+      // --- CAMBIO IMPORTANTE ---
+      // Ahora usamos addDoc para crear una nueva cita sin sobrescribir las anteriores
+      await addDoc(collection(db, "citas"), {
+        pacienteId: paciente.id,
         nombre: paciente.nombre,
         edad: paciente.edad,
         sexo: paciente.sexo,
@@ -117,19 +117,18 @@ export default function AsignarCita() {
         horaInicio,
         horaFin,
         imagenes: paciente.imagenes || [],
+        creadoEn: serverTimestamp(),
       });
 
-      // Obtener usuario actual desde localStorage (puede variar según tu sistema)
       const usuarioNombre = localStorage.getItem("username") || "Desconocido";
 
-      // Guardar log en la colección "logs" o "historial"
       await addDoc(collection(db, "logs"), {
-       accion: `Creó cita a: ${paciente.nombre}`,
-  fecha: serverTimestamp(),
-  pacienteId: paciente.id,
-  nombrePaciente: paciente.nombre,
-  usuarioId: usuarioNombre, // si quieres, puedes guardar solo nombre
-  usuarioNombre: usuarioNombre,
+        accion: `Creó cita a: ${paciente.nombre}`,
+        fecha: serverTimestamp(),
+        pacienteId: paciente.id,
+        nombrePaciente: paciente.nombre,
+        usuarioId: usuarioNombre,
+        usuarioNombre: usuarioNombre,
       });
 
       router.push(`/guardado?id=${id}`);
@@ -188,7 +187,7 @@ export default function AsignarCita() {
           className="btn-volver"
           aria-label="Volver a marcado"
           title="Volver"
-          style={{ position: "absolute", top: 20, left: 20}}
+          style={{ position: "absolute", top: 20, left: 20 }}
         >
           <svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 24 24" width="22" height="22">
             <path d="M15 19l-7-7 7-7" stroke="white" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
@@ -199,7 +198,7 @@ export default function AsignarCita() {
         </h2>
 
         <label style={labelStyle}>Fecha:</label>
-        <input type="date" value={fecha} onChange={handleFechaChange} style={inputStyle} min={minDate} max={maxDate} />
+        <input type="date" value={fecha} onChange={(e) => setFecha(e.target.value)} style={inputStyle} min={minDate} max={maxDate} />
 
         <label style={labelStyle}>Hora de inicio:</label>
         <input type="time" value={horaInicio} onChange={handleHoraInicioChange} style={inputStyle} />
