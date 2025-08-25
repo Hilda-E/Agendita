@@ -28,6 +28,9 @@ export default function RPaciente() {
   const [horaInicio, setHoraInicio] = useState(horaInicioParam);
   const [horaFin, setHoraFin] = useState(horaFinParam);
 
+  // --- NUEVO: estado para evitar doble click ---
+  const [isSaving, setIsSaving] = useState(false);
+
   const originalDataRef = useRef({});
 
   const currentYear = new Date().getFullYear(); // Año actual
@@ -120,11 +123,11 @@ export default function RPaciente() {
     const year = d.getFullYear();
     return dia !== 0 && dia !== 6 && year === currentYear; // Solo año actual
   };
-const formatToDDMMYYYY = (fechaISO) => {
-  if (!fechaISO) return "";
-  const [yyyy, mm, dd] = fechaISO.split("-");
-  return `${dd}-${mm}-${yyyy}`;
-};
+  const formatToDDMMYYYY = (fechaISO) => {
+    if (!fechaISO) return "";
+    const [yyyy, mm, dd] = fechaISO.split("-");
+    return `${dd}-${mm}-${yyyy}`;
+  };
 
   const validarHora = (hora) => {
     if (!/^\d{2}:\d{2}$/.test(hora)) return false;
@@ -133,14 +136,20 @@ const formatToDDMMYYYY = (fechaISO) => {
   };
 
   const registrarPaciente = async () => {
+    // --- NUEVO: previene doble click ---
+    if (isSaving) return;
+    setIsSaving(true);
+
     if (![nombre, edad, sexo, telefono, patologia, domicilio].every(Boolean)) {
       alert("Completa todos los campos antes de guardar.");
+      setIsSaving(false);
       return;
     }
 
     if (id) {
       if (!fecha || !validarFecha(fecha)) {
         alert(`Fecha inválida. Solo se permiten días hábiles del año ${currentYear}`);
+        setIsSaving(false);
         return;
       }
       if (
@@ -151,6 +160,7 @@ const formatToDDMMYYYY = (fechaISO) => {
         horaFin <= horaInicio
       ) {
         alert("Horario inválido (08:00 a 16:00) o hora fin menor que inicio");
+        setIsSaving(false);
         return;
       }
     }
@@ -238,6 +248,9 @@ const formatToDDMMYYYY = (fechaISO) => {
     } catch (error) {
       console.error(error);
       alert("Ocurrió un error al guardar.");
+    } finally {
+      // --- NUEVO: desbloquea el botón ---
+      setIsSaving(false);
     }
   };
 
@@ -465,21 +478,22 @@ const formatToDDMMYYYY = (fechaISO) => {
 
       <button
         onClick={registrarPaciente}
+        disabled={isSaving} // --- NUEVO: previene múltiples clicks ---
         style={{
           marginTop: 25,
-          backgroundColor: "#2563eb",
+          backgroundColor: isSaving ? "#9ca3af" : "#2563eb", // --- NUEVO: cambio visual si está guardando ---
           color: "white",
           padding: "14px 30px",
           border: "none",
           borderRadius: 8,
-          cursor: "pointer",
+          cursor: isSaving ? "not-allowed" : "pointer", // --- NUEVO ---
           fontSize: 20,
           fontWeight: "bold",
           width: "100%",
           boxShadow: "0 4px 12px rgba(37, 99, 235, 0.5)",
         }}
-        onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#1e40af")}
-        onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "#2563eb")}
+        onMouseOver={(e) => { if (!isSaving) e.currentTarget.style.backgroundColor = "#1e40af"; }}
+        onMouseOut={(e) => { if (!isSaving) e.currentTarget.style.backgroundColor = "#2563eb"; }}
       >
         Guardar
       </button>
