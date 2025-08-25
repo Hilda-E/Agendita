@@ -17,6 +17,7 @@ export default function Asignar() {
   const [errorHoraInicio, setErrorHoraInicio] = useState("");
   const [errorHoraFin, setErrorHoraFin] = useState("");
   const [errorGeneral, setErrorGeneral] = useState("");
+  const [guardando, setGuardando] = useState(false); // <-- NUEVO: control de guardado
 
   const currentYear = new Date().getFullYear();
   const minDate = `${currentYear}-01-01`;
@@ -74,16 +75,20 @@ export default function Asignar() {
   };
 
   const guardarCita = async () => {
+    if (guardando) return; // <-- NUEVO: previene múltiples clics
+    setGuardando(true);
     setErrorGeneral("");
 
     if (!fecha || !horaInicio || !horaFin) {
       alert("Selecciona fecha, hora de inicio y hora de fin");
+      setGuardando(false);
       return;
     }
 
     const selectedYear = new Date(fecha).getFullYear();
     if (selectedYear !== currentYear) {
       setErrorGeneral(`La fecha debe estar dentro del año ${currentYear}`);
+      setGuardando(false);
       return;
     }
 
@@ -92,19 +97,22 @@ export default function Asignar() {
     const inicioMinutes = hI[0] * 60 + hI[1];
     const finMinutes = hF[0] * 60 + hF[1];
 
-    if (errorHoraInicio || errorHoraFin) return;
+    if (errorHoraInicio || errorHoraFin) {
+      setGuardando(false);
+      return;
+    }
     if (finMinutes < inicioMinutes) {
       setErrorGeneral("La hora de fin no puede ser antes que la hora de inicio");
+      setGuardando(false);
       return;
     }
     if (inicioMinutes === finMinutes) {
       setErrorGeneral("La hora de inicio y fin no pueden ser iguales");
+      setGuardando(false);
       return;
     }
 
     try {
-      // --- CAMBIO IMPORTANTE ---
-      // Ahora usamos addDoc para crear una nueva cita sin sobrescribir las anteriores
       await addDoc(collection(db, "pacientes"), {
         pacienteId: paciente.id,
         nombre: paciente.nombre,
@@ -134,6 +142,7 @@ export default function Asignar() {
       router.push(`/guardado?id=${id}`);
     } catch (e) {
       alert("Error al guardar la cita: " + e.message);
+      setGuardando(false);
     }
   };
 
@@ -174,9 +183,10 @@ export default function Asignar() {
     backgroundColor: "#2563eb",
     color: "#fff",
     fontWeight: "bold",
-    cursor: "pointer",
+    cursor: guardando ? "not-allowed" : "pointer", // <-- NUEVO: cursor mientras guarda
     fontSize: 18,
     marginTop: 20,
+    opacity: guardando ? 0.6 : 1, // <-- NUEVO: se ve deshabilitado
   };
 
   return (
@@ -210,7 +220,7 @@ export default function Asignar() {
 
         {errorGeneral && <p style={{ color: "red", fontSize: 14, marginBottom: 10 }}>{errorGeneral}</p>}
 
-        <button onClick={guardarCita} style={btnStyle}>Guardar cita</button>
+        <button onClick={guardarCita} style={btnStyle} disabled={guardando}>Guardar cita</button>
       </div>
     </div>
   );
