@@ -110,11 +110,25 @@ const desmarcarPaciente = async (paciente) => {
     setMenuVisible(false);
   };
 
-  const crearCita = (paciente) => {
-    if (!paciente) return;
-    router.push(`/Asignar?id=${paciente.id}`);
+const crearCita = async (paciente) => {
+  if (!paciente) return;
+  try {
+    // Guardar cita en 'pacientes' con solo fecha, hora y pacienteId
+    const nuevaCita = await addDoc(collection(db, "pacientes"), {
+      pacienteId: paciente.id,
+      fecha: paciente.fecha || new Date().toISOString().split("T")[0], // Si quieres fecha por defecto
+      horaInicio: paciente.horaInicio || "08:00",
+      horaFin: paciente.horaFin || "08:30",
+    });
+
+    // Redirigir a RPaciente para completar o visualizar la cita
+    router.push(`/RPaciente?id=${nuevaCita.id}&origen=marcado`);
     setMenuVisible(false);
-  };
+  } catch (err) {
+    console.error("Error al crear cita:", err);
+    alert("Ocurrió un error al crear la cita.");
+  }
+};
 
   // Filtrado por búsqueda
   const pacientesFiltrados = pacientesMarcados.filter((p) =>

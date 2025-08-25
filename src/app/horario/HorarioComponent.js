@@ -29,19 +29,27 @@ export default function Horario() {
         const snapshot = await getDocs(q);
 
         const citasDia = [];
-        snapshot.forEach((docu) => {
-          const data = docu.data();
-          citasDia.push({
-            id: docu.id,
-            nombre: data.nombre || "Paciente",
-            edad: data.edad || "No especificada",
-            sexo: data.sexo || "No especificado",
-            patologia: data.patologia || "No especificada",
-            imagenes: data.imagenes || [],
-            horaInicio: data.horaInicio || "",
-            horaFin: data.horaFin || "",
-          });
-        });
+      snapshot.forEach(async (docu) => {
+  const data = docu.data();
+  let pacienteData = data; // por defecto
+  if (data.pacienteId) {
+    const pacienteRef = doc(db, "pacientesMarcados", data.pacienteId);
+    const pacienteSnap = await getDoc(pacienteRef);
+    if (pacienteSnap.exists()) {
+      pacienteData = pacienteSnap.data();
+    }
+  }
+  citasDia.push({
+    id: docu.id,
+    nombre: pacienteData.nombre || "Paciente",
+    edad: pacienteData.edad || "No especificada",
+    sexo: pacienteData.sexo || "No especificado",
+    patologia: pacienteData.patologia || "No especificada",
+    imagenes: pacienteData.imagenes || [],
+    horaInicio: data.horaInicio || "",
+    horaFin: data.horaFin || "",
+  });
+});
 
         if (citasDia.length === 0) {
           const fallbackSnap = await getDocs(collection(db, "pacientes"));
