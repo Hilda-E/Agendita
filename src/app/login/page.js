@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "../firebase";
@@ -38,6 +38,22 @@ export default function Login() {
     }
   };
 
+  useEffect(() => {
+    const marcarSesionInactiva = async () => {
+      const username = localStorage.getItem("username");
+      if (!username) return;
+      const q = query(collection(db, "usuarios"), where("username", "==", username));
+      const querySnapshot = await getDocs(q);
+      if (!querySnapshot.empty) {
+        const userRef = doc(db, "usuarios", querySnapshot.docs[0].id);
+        await updateDoc(userRef, { sesionActiva: false });
+      }
+    };
+
+    window.addEventListener("beforeunload", marcarSesionInactiva);
+    return () => window.removeEventListener("beforeunload", marcarSesionInactiva);
+  }, []);
+
   const handleLogin = async () => {
     try {
       if (usuario === "admin" && password === "12345678") {
@@ -60,15 +76,20 @@ export default function Login() {
       const userRef = doc(db, "usuarios", usuarioId);
       const userData = userDoc.data();
 
-      // 🔹 Verificar si ya hay una sesión activa
-      if (userData.sesionActiva) {
-        alert("Este usuario ya tiene una sesión activa. No se puede iniciar sesión dos veces al mismo tiempo.");
+      // ⚡ Comprobar expiración de sesión (1 minuto)
+      const tiempoSesion = 1 * 60 * 1000; // 1 minuto
+      const ultimaConexion = userData.ultimaConexion ? new Date(userData.ultimaConexion).getTime() : 0;
+      const ahora = new Date().getTime();
+      const sesionExpirada = ahora - ultimaConexion > tiempoSesion;
+
+      if (userData.sesionActiva && !sesionExpirada) {
+        alert("Este usuario ya tiene una sesión activa.");
         return;
       }
 
       const email = userData.email;
 
-      // 🔹 Marcar sesión como inactiva antes de iniciar (opcional)
+      // Marcar sesión como inactiva antes de iniciar (opcional)
       await updateDoc(userRef, { sesionActiva: false });
 
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
@@ -84,7 +105,7 @@ export default function Login() {
         ultimaConexion: new Date().toISOString()
       });
 
-      // 🔹 Guardamos username en localStorage para los logs
+      // Guardamos username en localStorage para los logs
       localStorage.setItem("username", usuario);
 
       await registrarAccion(usuarioId, "Inicio de sesión", { username: usuario });
