@@ -122,7 +122,7 @@ const crearCita = async (paciente) => {
     });
 
     // Redirigir a RPaciente para completar o visualizar la cita
-    router.push(`/RPaciente?id=${nuevaCita.id}&origen=marcado`);
+     router.push(`/AsignarCita?id=${paciente.id}`);
     setMenuVisible(false);
   } catch (err) {
     console.error("Error al crear cita:", err);
